@@ -4,18 +4,38 @@
 #include "mkl-cholesky.h"
 #include "rdtsc.h"
 
-int main() {
-  const int N = 64;
+int getArgNum(int argc, char* argv[], int i, int defaultNum) {
+  if (i >= argc) {
+    return defaultNum;
+  }
+  char* p;
+  char* arg = argv[i];
+  double res;
+  if (sscanf(arg, "%lf", &res)) {
+    return (int) res;
+  } else {
+    return defaultNum;
+  }
+}
+
+
+int main(int argc, char* argv[]) {
+  int N = 64;
   long long int t1, t2;
 
   double *A, *x, *L, *rhs;
+  
+  N = getArgNum(argc, argv, 1, N);
+
+
+  printf("Cholesky system generation");fflush(stdout);
   t1 = rdtsc();
   if (!allocate_generate_cholesky_system_d(&A, &L, &x, &rhs, N)) {
-    fprintf(stderr, "Failed to allocate a %ix%i cholesky system", N, N);
+    fprintf(stderr, "\nFailed to allocate a %ix%i cholesky system", N, N);
     return 1;
   }
   t2 = rdtsc();
-  printf("Cholesky system generated in %lli cycles\n", t2 - t1);
+  printf("\rCholesky system generated in %lli cycles\n", t2 - t1);
 
   if (N <= 16) {
     printf("\nA:\n");
@@ -25,16 +45,16 @@ int main() {
     show_matrix_d(L, N, N);
 
     printf("\ntheoretical x:\n");
-    show_matrix_d(x, N, 1);
+    show_matrix_d(x, 1, N);
 
     printf("\nrhs:\n");
-    show_matrix_d(rhs, N, 1);
+    show_matrix_d(rhs, 1, N);
   }
 
   zero_matrix_d(L, N, N);
   zero_vector_d(x, N);
 
-  printf("\nFactorizing");
+  printf("\nFactorizing");fflush(stdout);
 
   t1 = rdtsc();
   factorize_cholesky_d(A, L, N);
@@ -54,7 +74,7 @@ int main() {
     }
   }
 
-  printf("\nForwarding");
+  printf("\nForwarding");fflush(stdout);
 
   t1 = rdtsc();
   forward_cholesky_d(L, rhs, x, N);
