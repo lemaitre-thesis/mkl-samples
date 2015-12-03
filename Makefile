@@ -11,8 +11,8 @@ OBJ_PATH = obj
 EXE_PATH = exe
 INC_PATH = include
 
-#LIB_LIB_PATH = -lmkl_rt -lrt -static-libgcc
-LIB_LIB_PATH = -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lm -lrt -static-libgcc
+#LIB_LIB_PATH = -DMKL_DIRECT_CALL_SEQ -lmkl_rt -lrt -static-libgcc
+LIB_LIB_PATH = -DMKL_DIRECT_CALL_SEQ -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lm -lrt -static-libgcc
 LIB_INC_PATH = 
 
 # -- Macros ----------
@@ -78,4 +78,4 @@ clean:
 
 compile: $(EXE_PATH)/$(PRODUCT)
 run: $(EXE_PATH)/$(PRODUCT)
-	$(EXE_PATH)/$(PRODUCT)
+	$(EXE_PATH)/$(PRODUCT) $(ARGS)
