@@ -1,20 +1,29 @@
 #include <stdio.h>
 #include "main.h"
 #include "mkl-main.h"
+#include "mkl-cholesky.h"
 
 int main() {
-  double *A = allocate_d(16, 16);
-  if (A == NULL) {
-    fprintf(stderr, "Failed to allocate a 16x16 matrix of double.\n");
+  const int N = 4;
+
+  double *A, *x, *L, *rhs;
+  if (!allocate_generate_cholesky_system_d(&A, &L, &x, &rhs, N)) {
+    fprintf(stderr, "Failed to allocate a %ix%i cholesky system", N, N);
     return 1;
   }
-  printf("Successful allocation of a 16x16 matrix of double using MKL.\n\n");
-  
-  zero_matrix_d(A, 16, 16);
 
   printf("A:\n");
-  show_matrix_d(A, 16, 16);
+  show_matrix_d(A, N, N);
+
+  printf("rhs:  ");
+  show_vector_d(rhs, N);
+  printf("\n");
 
   free_d(A);
+  free_d(L);
+  free_d(x);
+  free_d(rhs);
+
+
   return 0;
 }

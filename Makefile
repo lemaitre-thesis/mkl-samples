@@ -3,7 +3,7 @@
 # -------------------- #
 
 # -- Lile list ----------
-FILE = main.c mkl-main.c
+FILE = main.c mkl-main.c mkl-cholesky.c
 
 # -- Paths ----------
 SRC_PATH = src
