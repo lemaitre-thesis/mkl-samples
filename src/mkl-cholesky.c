@@ -119,3 +119,91 @@ int allocate_generate_cholesky_system_d(double** Aptr, double** Lptr, double** x
 
   return 1;
 }
+
+
+
+
+
+
+
+void factorize_cholesky_s(const float*  A, float*  L, int n) {
+  LAPACKE_slacpy(LAPACK_ROW_MAJOR, 'L', n, n, A, n, L, n);
+  LAPACKE_spotrf(LAPACK_ROW_MAJOR, 'L', n, L, n);
+}
+void factorize_cholesky_d(const double* A, double* L, int n) {
+  LAPACKE_dlacpy(LAPACK_ROW_MAJOR, 'L', n, n, A, n, L, n);
+  LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'L', n, L, n);
+}
+
+void forward_cholesky_s(const float*  L, const float*  rhs, float*  x, int n) {
+  cblas_scopy(n, rhs, 1, x, 1);
+  LAPACKE_spotrs(LAPACK_ROW_MAJOR, 'L', n, 1, L, n, x, 1);
+}
+void forward_cholesky_d(const double* L, const double* rhs, double* x, int n) {
+  cblas_dcopy(n, rhs, 1, x, 1);
+  LAPACKE_dpotrs(LAPACK_ROW_MAJOR, 'L', n, 1, L, n, x, 1);
+}
+
+int is_valid_cholesky_factorization_s(const float*  L, int n) {
+  int i;
+  for (i = 0; i < n; ++i) {
+    if (L[i*n+i] == 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+int is_valid_cholesky_factorization_d(const double* L, int n) {
+  int i;
+  for (i = 0; i < n; ++i) {
+    if (L[i*n+i] == 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int solve_cholesky_system_s(const float*  A, float*  L, float*  x, const float*  rhs, int n) {
+  float *Lowned = NULL;
+  if (L == NULL) {
+    L = allocate_s(n, n);
+    Lowned = L;
+  }
+  if (L == NULL) {
+    return 0;
+  }
+
+  factorize_cholesky_s(A, L, n);
+
+  if (!is_valid_cholesky_factorization_s(L, n)) {
+    free_s(Lowned);
+    return 0;
+  }
+
+  forward_cholesky_s(L, rhs, x, n);
+
+  free_s(Lowned);
+  return 1;
+}
+int solve_cholesky_system_d(const double* A, double* L, double* x, const double* rhs, int n) {
+  double *Lowned = NULL;
+  if (L == NULL) {
+    L = allocate_d(n, n);
+    Lowned = L;
+  }
+  if (L == NULL) {
+    return 0;
+  }
+
+  factorize_cholesky_d(A, L, n);
+
+  if (!is_valid_cholesky_factorization_d(L, n)) {
+    free_d(Lowned);
+    return 0;
+  }
+
+  forward_cholesky_d(L, rhs, x, n);
+
+  free_d(Lowned);
+  return 1;
+}

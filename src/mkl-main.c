@@ -42,7 +42,7 @@ void show_matrix_s(float*  M, int n, int m) {
   float* Mi;
   
   for (i = 0; i < n; ++i) {
-    Mi = &M[i*n];
+    Mi = &M[i*m];
     printf("%.4f", Mi[0]);
     for (j = 1; j < m; ++j) {
       printf("\t%.4f", Mi[j]);
@@ -55,7 +55,7 @@ void show_matrix_d(double* M, int n, int m) {
   double* Mi;
   
   for (i = 0; i < n; ++i) {
-    Mi = &M[i*n];
+    Mi = &M[i*m];
     printf("%.4lf", Mi[0]);
     for (j = 1; j < m; ++j) {
       printf("\t%.4lf", Mi[j]);
